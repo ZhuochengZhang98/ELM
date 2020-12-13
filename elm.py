@@ -229,64 +229,6 @@ class normal_ELM:
         else:
             return lambda x: x
 
-class kernel_ELM:
-    def __init__(self, input_shape, output_shape, kernel='rbf') -> None:
-        self.kernel_features = output_shape
-        self.input_shape = input_shape
-        self.kernel = self.kernel_func(kernel)
-        self.beta = np.random.rand(output_shape, 1)
-
-    def train(self, x, y):
-        assert x.shape[1] == self.input_shape
-        x = self.kernel(x)
-        self.beta = np.matmul(np.linalg.pinv(x), y)
-
-    def test(self, x):
-        assert x.shape[1] == self.input_shape
-        x = self.kernel(x)
-        y = np.matmul(x, self.beta)
-        return y
-
-    def kernel_func(self, kernel_type):
-        if kernel_type == 'rbf':
-            return self.rbf_kernel
-        else:
-            return lambda x, _: x
-
-    def rbf_kernel(self, x):
-        bsz, x_features = x.shape
-        mini = np.min(x, axis=0)
-        maxi = np.max(x, axis=0)
-        anchors = np.random.rand(self.kernel_features, x_features)
-        anchors = anchors * (maxi - mini) + mini
-        x = x.repeat(self.kernel_features, axis=1).reshape(
-            bsz, x_features, self.kernel_features).transpose(0, 2, 1)
-        anchors = anchors.reshape(1, self.kernel_features, x_features)
-        y = np.linalg.norm(x - anchors, axis=2)
-        y = np.exp(-y*y/2)
-        return y
-
-
-def rbf_kernel(x, features=1):
-    bsz, x_features = x.shape
-    mini = np.min(x, axis=0)
-    maxi = np.max(x, axis=0)
-    anchors = np.random.rand(features, x_features)
-    anchors = anchors * (maxi - mini) + mini
-    x = x.repeat(features, axis=1).reshape(
-        bsz, x_features, features).transpose(0, 2, 1)
-    anchors = anchors.reshape(1, features, x_features)
-    y = np.linalg.norm(x - anchors, axis=2)
-    y = np.exp(-y*y/2)
-    return y
-
-
-def custom_rbf(x, anchors):
-    # y = np.linalg.norm(x - anchors, axis=1)
-    y = x - anchors
-    y = np.exp(-y*y/2)
-    return y
-
 
 if __name__ == "__main__":
     a = np.random.rand(30, 3)
