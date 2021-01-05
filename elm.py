@@ -2,18 +2,41 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from numpy.core.fromnumeric import shape
 
 # TODO
 # 1. 实现高斯核函数
 # 2. 对比高斯核函数、随机矩阵下SVM和ELM的分类效果、速度
-# 3. 实现多层ELM（待定）
-# 4. 使用Bert作为核函数进行情感分类
+# 3. 实现多层ELM
 
 
 class ELM:
+    """
+    An ELM wrapper
+    """
     def __init__(self, args) -> None:
-        pass
+        if args.type == 'basic':
+            self.elm = basic_ELM(args.input_shape,
+                                 args.hidden_dim,
+                                 args.activation)
+        elif args.type == 'normal':
+            self.elm = normal_ELM(args.input_shape,
+                                  args.output_shape,
+                                  args.activation,
+                                  args.normalize)
+        elif args.type == 'classic':
+            self.elm = classic_ELM(args.input_shape,
+                                 args.hidden_dim,
+                                 args.activation,
+                                 args.normalize,
+                                 args.classes)
+    def train(self, x, y):
+        self.elm.train(x, y)
+    
+    def test(self, x, y):
+        self.elm.test(x, y)
+
+    def infer(self, x, y):
+        self.elm.infer(x, y)
 
 
 class basic_ELM:
@@ -228,11 +251,3 @@ class normal_ELM:
             return lambda x: 1/(1+np.exp(-x))
         else:
             return lambda x: x
-
-
-if __name__ == "__main__":
-    a = np.random.rand(30, 3)
-    a[:, 0] = a[:, 0] * 20 + 30
-    a[:, 2] = a[:, 2] + 5
-    b = rbf_kernel(a, 10)
-    print(b.shape)
