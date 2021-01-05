@@ -5,17 +5,17 @@ This is a sentiment classifier implemented via **E**xtreme **L**earning **m**ach
 ## 1. Requirements
 
 ### For ELM
-- numpy
-- matplotlib(optional)
-- tqdm(optional)
-- sklearn(optional)
+- numpy==1.19.4
+- matplotlib==3.3.3(optional)
+- tqdm==4.54.0(optional)
+- sklearn==0.23.2(optional)
 
 ### For sentiment classification
-- pytorch
-- transformers
-- matplotlib
-- pandas
-- tqdm
+- pytorch==1.7.0
+- transformers==4.0.0
+- matplotlib==3.3.3
+- pandas==1.1.4
+- tqdm==4.54.0
 
 ## 2. Getting Started
 
