@@ -63,4 +63,5 @@ python sentiment.py --help
 
 ## 3. TODO
 - [ ] add rbf kernel for elm
+- [ ] add multi-layer elm
 - [ ] add chinese dataset support for sentiment classify
