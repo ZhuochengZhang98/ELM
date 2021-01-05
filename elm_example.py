@@ -1,24 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import time
 import numpy as np
-from torch.functional import norm
-from tqdm import tqdm, trange
+from tqdm import trange
 import matplotlib.pyplot as plt
 
 from sklearn import svm
-from elm import basic_ELM, normal_ELM, classic_ELM
-
-# TODO
-# 1. 实现高斯核函数
-# 2. 对比高斯核函数、随机矩阵下SVM和ELM的分类效果、速度
-# 3. 实现多层ELM（待定）
-# 4. 使用Bert作为前置函数进行情感分类
+from elm import classic_ELM
 
 
 def linear_data(shape=5, bsz=500):
+    """Generate linearly separable data
+
+    Args:
+        shape (int, optional): dimensions of the data. Defaults to 5.
+        bsz (int, optional): batch size. Defaults to 500.
+
+    Returns:
+        tuple: (x_train, y_train, x_eval, y_eval)
+    """
     x_train = np.random.rand(bsz*10, shape)
     y_train = np.sum(x_train, axis=1) > shape/2
     y_train = y_train.astype(np.float)
@@ -30,6 +31,15 @@ def linear_data(shape=5, bsz=500):
 
 
 def xor_data(shape=2, bsz=500):
+    """Generate linearly separable data
+
+    Args:
+        shape (int, optional): dimensions of the data. Defaults to and must be 2.
+        bsz (int, optional): batch size. Defaults to 500.
+
+    Returns:
+        tuple: (x_train, y_train, x_eval, y_eval)
+    """
     assert shape == 2
     x_train = np.random.rand(bsz*10, shape)
     y_train = (x_train[:, 0] > 0.5) * (x_train[:, 1] > 0.5)
@@ -72,7 +82,7 @@ def show_plane(x, y, y_infer=None, pic_name='dummy.png'):
 
 
 def test_elm(times=10, draw=False):
-    """Test for n times to checkout average accuracy
+    """Test for n times to checkout average accuracy with elm
 
     Args:
         times (int, optional): [description]. Defaults to 10.
@@ -87,12 +97,12 @@ def test_elm(times=10, draw=False):
     # main part
     acc_list = []
     start_time = time.time()
+    x_test = None
+    y_test = None
+    y_t = None
     for i in trange(0, times):
         x_train, y_train, x_test, y_test = xor_data(shape, bsz)
-        # x_train, y_train, x_test, y_test = linear_data(shape, bsz)
-        # elm = normal_ELM(shape, hidden_size, 'sigmoid', normal_c)
         elm = classic_ELM(shape, hidden_size, norm=normal_c)
-        # elm = basic_ELM(shape, hidden_size)
         elm.train(x_train, y_train)
         y_t = elm.infer(x_test)
         y_t = y_t.astype(np.float)
@@ -111,15 +121,22 @@ def test_elm(times=10, draw=False):
 
 
 def test_svm(times=10, draw=False):
+    """Test for n times to checkout average accuracy with svm
+
+    Args:
+        times (int, optional): [description]. Defaults to 10.
+    """
     # parameters
     assert times > 0
     shape = 2
     bsz = 1000
-    # hidden_size = 100
 
     # main part
     acc_list = []
     start_time = time.time()
+    x_test = None
+    y_test = None
+    y_t = None
     for i in trange(0, times):
         svm_c = svm.SVC(gamma='scale', kernel='rbf')
         x_train, y_train, x_test, y_test = xor_data(shape, bsz)
@@ -141,6 +158,4 @@ def test_svm(times=10, draw=False):
 
 
 if __name__ == "__main__":
-    # os.chdir('./认知计算')
-    # test_svm(10, True)
     test_elm(100, False)
